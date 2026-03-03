@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qissi Ahmed — Technicien Automobile</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f0e8;
+    --red: #e63312;
+    --orange: #f07030;
+    --steel: #1c2b3a;
+    --gray: #8a8a8a;
+    --light: #d4cfc6;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--red);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.2s, height 0.2s, background 0.2s;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 40px; height: 40px;
+    border: 1px solid rgba(230,51,18,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease-out, width 0.3s, height 0.3s;
+  }
+  body:hover .cursor { opacity: 1; }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 24px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(10,10,10,0.95), transparent);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 4px;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--red); }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--gray);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--red); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 120px 48px 80px 80px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .hero-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(72px, 9vw, 130px);
+    line-height: 0.9;
+    letter-spacing: 2px;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+  .hero-name .line2 { color: var(--red); display: block; }
+
+  .hero-desc {
+    font-size: 16px;
+    font-weight: 300;
+    color: var(--light);
+    line-height: 1.7;
+    max-width: 420px;
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 20px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+
+  .btn-primary {
+    background: var(--red);
+    color: var(--white);
+    padding: 14px 32px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-decoration: none;
+    text-transform: uppercase;
+    border: 2px solid var(--red);
+    transition: all 0.3s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: transparent; color: var(--red); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--white);
+    padding: 14px 32px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-decoration: none;
+    text-transform: uppercase;
+    border: 2px solid rgba(245,240,232,0.2);
+    transition: all 0.3s;
+    display: inline-block;
+  }
+  .btn-secondary:hover { border-color: var(--white); }
+
+  .hero-right {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-engine {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(230,51,18,0.15) 0%, transparent 70%);
+    animation: pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+  }
+
+  .hero-gear {
+    width: 380px;
+    height: 380px;
+    opacity: 0;
+    animation: fadeIn 1s 1s forwards, rotateSlow 30s linear infinite;
+    position: relative;
+    z-index: 2;
+  }
+
+  @keyframes rotateSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  .hero-stats {
+    position: absolute;
+    bottom: 60px;
+    right: 60px;
+    display: flex;
+    gap: 48px;
+    opacity: 0;
+    animation: fadeUp 0.8s 1.2s forwards;
+    z-index: 2;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: var(--red);
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--gray);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .hero-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--red), transparent);
+  }
+
+  /* SECTION TITLES */
+  .section { padding: 100px 80px; position: relative; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 64px;
+  }
+  .section-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--red);
+    letter-spacing: 2px;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 5vw, 64px);
+    letter-spacing: 3px;
+    line-height: 1;
+  }
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(245,240,232,0.1);
+  }
+
+  /* COMPETENCES */
+  .skills-section { background: var(--steel); }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .skill-card {
+    background: rgba(10,10,10,0.6);
+    padding: 40px;
+    border-top: 3px solid transparent;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .skill-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 0; height: 2px;
+    background: var(--red);
+    transition: width 0.4s;
+  }
+  .skill-card:hover { border-top-color: var(--red); background: rgba(10,10,10,0.9); }
+  .skill-card:hover::after { width: 100%; }
+
+  .skill-icon {
+    font-size: 36px;
+    margin-bottom: 20px;
+    display: block;
+  }
+  .skill-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    color: var(--white);
+  }
+  .skill-desc {
+    font-size: 14px;
+    color: var(--gray);
+    line-height: 1.6;
+  }
+
+  .skill-bar-wrap { margin-top: 20px; }
+  .skill-bar-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--gray);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .skill-bar {
+    height: 2px;
+    background: rgba(255,255,255,0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  .skill-bar-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--red), var(--orange));
+    width: 0;
+    transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* FORMATION */
+  .formation-section { background: var(--black); }
+
+  .timeline {
+    position: relative;
+    padding-left: 48px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 8px; bottom: 8px;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--red), transparent);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 56px;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: all 0.6s;
+  }
+  .timeline-item.visible { opacity: 1; transform: translateX(0); }
+
+  .timeline-dot {
+    position: absolute;
+    left: -52px; top: 6px;
+    width: 10px; height: 10px;
+    border: 2px solid var(--red);
+    background: var(--black);
+    border-radius: 50%;
+    transition: background 0.3s;
+  }
+  .timeline-item:hover .timeline-dot { background: var(--red); }
+
+  .timeline-date {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--red);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .timeline-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+  .timeline-school {
+    font-size: 13px;
+    color: var(--gray);
+    font-style: italic;
+    margin-bottom: 12px;
+  }
+  .timeline-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(230,51,18,0.15);
+    border: 1px solid rgba(230,51,18,0.3);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--red);
+    letter-spacing: 1px;
+  }
+
+  /* EXPERIENCE */
+  .experience-section { background: #0f0f0f; }
+
+  .exp-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+
+  .exp-card {
+    background: rgba(28,43,58,0.4);
+    padding: 48px;
+    border-left: 3px solid transparent;
+    transition: all 0.3s;
+    position: relative;
+  }
+  .exp-card:hover { border-left-color: var(--red); background: rgba(28,43,58,0.7); }
+
+  .exp-period {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--red);
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  .exp-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .exp-company {
+    font-size: 14px;
+    color: var(--orange);
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+  .exp-tasks { list-style: none; }
+  .exp-tasks li {
+    font-size: 14px;
+    color: var(--gray);
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding-left: 16px;
+    position: relative;
+  }
+  .exp-tasks li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--red);
+    font-size: 12px;
+  }
+
+  /* LANGUES */
+  .langues-section { background: var(--steel); }
+
+  .lang-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    margin-bottom: 64px;
+  }
+
+  .lang-card {
+    padding: 32px;
+    border: 1px solid rgba(255,255,255,0.07);
+    text-align: center;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .lang-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(230,51,18,0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .lang-card:hover::before { opacity: 1; }
+  .lang-card:hover { border-color: rgba(230,51,18,0.3); }
+
+  .lang-flag { font-size: 40px; margin-bottom: 12px; display: block; }
+  .lang-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .lang-level {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--red);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* CONTACT */
+  .contact-section {
+    background: var(--black);
+    text-align: center;
+    padding: 120px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .contact-section::before {
+    content: 'CONTACT';
+    position: absolute;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 25vw;
+    color: rgba(255,255,255,0.02);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .contact-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 8vw, 96px);
+    letter-spacing: 4px;
+    line-height: 1;
+    margin-bottom: 24px;
+  }
+  .contact-title span { color: var(--red); }
+
+  .contact-sub {
+    font-size: 16px;
+    color: var(--gray);
+    margin-bottom: 64px;
+    font-weight: 300;
+  }
+
+  .contact-links {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 28px;
+    border: 1px solid rgba(255,255,255,0.1);
+    text-decoration: none;
+    color: var(--white);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+  }
+  .contact-item:hover { border-color: var(--red); color: var(--red); background: rgba(230,51,18,0.05); }
+  .contact-item .ico { font-size: 18px; }
+
+  /* FOOTER */
+  footer {
+    padding: 32px 80px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer p {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--gray);
+    letter-spacing: 1px;
+  }
+  footer span { color: var(--red); }
+
+  /* SCROLL INDICATOR */
+  .scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 80px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    animation: fadeIn 1s 1.5s forwards;
+  }
+  .scroll-line {
+    width: 40px;
+    height: 1px;
+    background: var(--red);
+    animation: expandLine 2s ease-in-out infinite;
+  }
+  @keyframes expandLine {
+    0%, 100% { width: 40px; }
+    50% { width: 60px; }
+  }
+  .scroll-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--gray);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-left { padding: 100px 24px 60px; }
+    .hero-right { display: none; }
+    .section { padding: 80px 24px; }
+    .skills-grid { grid-template-columns: 1fr; }
+    .exp-grid { grid-template-columns: 1fr; }
+    .lang-grid { grid-template-columns: 1fr 1fr; }
+    footer { flex-direction: column; gap: 12px; text-align: center; }
+    .hero-stats { position: relative; bottom: auto; right: auto; padding: 0 24px 60px; justify-content: center; }
+    .contact-section { padding: 80px 24px; }
+    .contact-links { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Q<span>.</span>AHMED</a>
+  <ul class="nav-links">
+    <li><a href="#competences">Compétences</a></li>
+    <li><a href="#formation">Formation</a></li>
+    <li><a href="#experience">Expérience</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <p class="hero-tag">// Technicien Automobile · Oujda, Maroc</p>
+    <h1 class="hero-name">
+      QISSI<br>
+      <span class="line2">AHMED</span>
+    </h1>
+    <p class="hero-desc">
+      Spécialisé en Diagnostic & Électronique Embarquée. 
+      24 ans. Passionné par la mécanique de précision, 
+      les systèmes embarqués et la technologie automobile.
+    </p>
+    <div class="hero-cta">
+      <a href="#contact" class="btn-primary">Me contacter</a>
+      <a href="#formation" class="btn-secondary">Mon parcours</a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-engine"></div>
+    <svg class="hero-gear" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="70" stroke="rgba(230,51,18,0.15)" stroke-width="1"/>
+      <circle cx="100" cy="100" r="50" stroke="rgba(230,51,18,0.25)" stroke-width="1"/>
+      <circle cx="100" cy="100" r="20" stroke="rgba(230,51,18,0.8)" stroke-width="2"/>
+      <circle cx="100" cy="100" r="8" fill="rgba(230,51,18,0.6)"/>
+      <!-- Gear teeth -->
+      <g stroke="rgba(230,51,18,0.6)" stroke-width="2">
+        <line x1="100" y1="20" x2="100" y2="35"/>
+        <line x1="100" y1="165" x2="100" y2="180"/>
+        <line x1="20" y1="100" x2="35" y2="100"/>
+        <line x1="165" y1="100" x2="180" y2="100"/>
+        <line x1="43" y1="43" x2="54" y2="54"/>
+        <line x1="146" y1="146" x2="157" y2="157"/>
+        <line x1="157" y1="43" x2="146" y2="54"/>
+        <line x1="54" y1="146" x2="43" y2="157"/>
+      </g>
+      <!-- Orbit dots -->
+      <circle cx="100" cy="30" r="4" fill="rgba(230,51,18,0.8)"/>
+      <circle cx="170" cy="100" r="4" fill="rgba(240,112,48,0.6)"/>
+      <circle cx="100" cy="170" r="4" fill="rgba(230,51,18,0.4)"/>
+      <circle cx="30" cy="100" r="4" fill="rgba(240,112,48,0.8)"/>
+      <!-- Technical lines -->
+      <path d="M 60 60 L 140 60 L 140 140 L 60 140 Z" stroke="rgba(230,51,18,0.08)" stroke-width="1"/>
+      <circle cx="100" cy="100" r="35" stroke="rgba(240,112,48,0.3)" stroke-width="1" stroke-dasharray="4 4"/>
+    </svg>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">3+</div>
+      <div class="stat-label">Diplômes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">12</div>
+      <div class="stat-label">Mois Exp.</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">3</div>
+      <div class="stat-label">Langues</div>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    <div class="scroll-line"></div>
+    <span class="scroll-text">Scroll</span>
+  </div>
+
+  <div class="hero-line"></div>
+</section>
+
+<!-- COMPÉTENCES -->
+<section class="section skills-section" id="competences">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Compétences</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="skills-grid">
+    <div class="skill-card">
+      <span class="skill-icon">🔧</span>
+      <div class="skill-name">Diagnostic Mécanique</div>
+      <p class="skill-desc">Identification et résolution des pannes mécaniques complexes avec précision.</p>
+      <div class="skill-bar-wrap">
+        <div class="skill-bar-label">Niveau</div>
+        <div class="skill-bar"><div class="skill-bar-fill" data-width="90"></div></div>
+      </div>
+    </div>
+    <div class="skill-card">
+      <span class="skill-icon">⚡</span>
+      <div class="skill-name">Électronique Embarquée</div>
+      <p class="skill-desc">Maîtrise des systèmes électroniques embarqués et protocoles de communication.</p>
+      <div class="skill-bar-wrap">
+        <div class="skill-bar-label">Niveau</div>
+        <div class="skill-bar"><div class="skill-bar-fill" data-width="85"></div></div>
+      </div>
+    </div>
+    <div class="skill-card">
+      <span class="skill-icon">💻</span>
+      <div class="skill-name">Diagnostic OBD</div>
+      <p class="skill-desc">Utilisation avancée des outils de diagnostic OBD2 et logiciels constructeurs.</p>
+      <div class="skill-bar-wrap">
+        <div class="skill-bar-label">Niveau</div>
+        <div class="skill-bar"><div class="skill-bar-fill" data-width="88"></div></div>
+      </div>
+    </div>
+    <div class="skill-card">
+      <span class="skill-icon">📐</span>
+      <div class="skill-name">Schémas Techniques</div>
+      <p class="skill-desc">Lecture et interprétation de schémas électriques et mécaniques.</p>
+      <div class="skill-bar-wrap">
+        <div class="skill-bar-label">Niveau</div>
+        <div class="skill-bar"><div class="skill-bar-fill" data-width="80"></div></div>
+      </div>
+    </div>
+    <div class="skill-card">
+      <span class="skill-icon">🤝</span>
+      <div class="skill-name">Esprit d'Équipe</div>
+      <p class="skill-desc">Communication efficace, sens du détail et gestion du stress en atelier.</p>
+      <div class="skill-bar-wrap">
+        <div class="skill-bar-label">Niveau</div>
+        <div class="skill-bar"><div class="skill-bar-fill" data-width="95"></div></div>
+      </div>
+    </div>
+    <div class="skill-card">
+      <span class="skill-icon">🖥️</span>
+      <div class="skill-name">Informatique</div>
+      <p class="skill-desc">Microsoft Office (Word, Excel, PowerPoint), Internet et outils numériques.</p>
+      <div class="skill-bar-wrap">
+        <div class="skill-bar-label">Niveau</div>
+        <div class="skill-bar"><div class="skill-bar-fill" data-width="75"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORMATION -->
+<section class="section formation-section" id="formation">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2 class="section-title">Formation</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-date">2023 — 2025</div>
+      <div class="timeline-title">Technicien Spécialisé — Diagnostic & Électronique Embarquée</div>
+      <div class="timeline-school">ISTA Koullouch, Oujda</div>
+      <span class="timeline-tag">T.S.D.E.E</span>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-date">2021 — 2023</div>
+      <div class="timeline-title">Technicien — Réparation d'Engins à Moteur</div>
+      <div class="timeline-school">ISTA Koullouch, Oujda</div>
+      <span class="timeline-tag">T.R.E.M</span>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-date">2019 — 2021</div>
+      <div class="timeline-title">Qualification — Réparation de Véhicules Automobiles</div>
+      <div class="timeline-school">ISTA Koullouch, Oujda</div>
+      <span class="timeline-tag">R.V.A</span>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-date">2018 — 2019</div>
+      <div class="timeline-title">Première Année Lycée</div>
+      <div class="timeline-school">Lycée Isly, Oujda</div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPÉRIENCE -->
+<section class="section experience-section" id="experience">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2 class="section-title">Expérience</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="exp-grid">
+    <div class="exp-card">
+      <div class="exp-period">// 2 MOIS · STAGE</div>
+      <div class="exp-title">Technicien Stagiaire</div>
+      <div class="exp-company">AIKAD AUTO — Oujda</div>
+      <ul class="exp-tasks">
+        <li>Diagnostic des pannes mécaniques et électroniques</li>
+        <li>Entretien et réparation de véhicules automobiles</li>
+        <li>Utilisation d'outils de diagnostic embarqué OBD</li>
+      </ul>
+    </div>
+    <div class="exp-card">
+      <div class="exp-period">// 10 MOIS · ATELIERS</div>
+      <div class="exp-title">Technicien Mécanicien</div>
+      <div class="exp-company">Divers Ateliers — Oujda</div>
+      <ul class="exp-tasks">
+        <li>Réparation et entretien de véhicules légers</li>
+        <li>Diagnostic mécanique et identification des pannes</li>
+        <li>Travail en équipe dans un environnement d'atelier</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- LANGUES -->
+<section class="section langues-section">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Langues</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="lang-grid">
+    <div class="lang-card">
+      <span class="lang-flag">🇲🇦</span>
+      <div class="lang-name">Arabe</div>
+      <div class="lang-level">Langue maternelle</div>
+    </div>
+    <div class="lang-card">
+      <span class="lang-flag">🇬🇧</span>
+      <div class="lang-name">Anglais</div>
+      <div class="lang-level">Avancé</div>
+    </div>
+    <div class="lang-card">
+      <span class="lang-flag">🇫🇷</span>
+      <div class="lang-name">Français</div>
+      <div class="lang-level">Intermédiaire</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+  <h2 class="contact-title">TRAVAILLONS<br><span>ENSEMBLE</span></h2>
+  <p class="contact-sub">Disponible pour un stage, un poste ou une collaboration</p>
+  <div class="contact-links">
+    <a href="tel:+212654709706" class="contact-item">
+      <span class="ico">📞</span> +212 654 709 706
+    </a>
+    <a href="mailto:ahmedkissi04@gmail.com" class="contact-item">
+      <span class="ico">✉️</span> ahmedkissi04@gmail.com
+    </a>
+    <a href="#" class="contact-item">
+      <span class="ico">📍</span> Oujda, Maroc
+    </a>
+    <a href="#" class="contact-item">
+      <span class="ico">🚗</span> Permis B
+    </a>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 <span>Qissi Ahmed</span> — Technicien Automobile</p>
+  <p>Oujda, Maroc <span>·</span> Disponible immédiatement</p>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '20px';
+      cursor.style.height = '20px';
+      cursor.style.background = 'var(--orange)';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '12px';
+      cursor.style.height = '12px';
+      cursor.style.background = 'var(--red)';
+    });
+  });
+
+  // Scroll animations
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        // Animate skill bars
+        entry.target.querySelectorAll('.skill-bar-fill').forEach(bar => {
+          bar.style.width = bar.dataset.width + '%';
+        });
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.timeline-item, .skill-card, .exp-card, .lang-card').forEach(el => {
+    observer.observe(el);
+  });
+
+  // Animate skill bars on section enter
+  const skillsObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.querySelectorAll('.skill-bar-fill').forEach(bar => {
+          setTimeout(() => { bar.style.width = bar.dataset.width + '%'; }, 300);
+        });
+      }
+    });
+  }, { threshold: 0.2 });
+
+  document.querySelectorAll('.skills-section').forEach(el => skillsObserver.observe(el));
+</script>
+</body>
+</html>
